@@ -16,7 +16,7 @@ pub fn build(b: *std.build.Builder, options: Options) *std.build.LibExeObjStep {
     exe_options.addOption(bool, "enable_d2d", false);
     exe_options.addOption([]const u8, "content_dir", content_dir);
 
-    const exe = b.addExecutable("minimal", thisDir() ++ "/src/minimal.zig");
+    const exe = b.addExecutable("minimal", comptime thisDir() ++ "/src/minimal.zig");
     exe.setBuildMode(options.build_mode);
     exe.setTarget(options.target);
     exe.addOptions("build_options", exe_options);

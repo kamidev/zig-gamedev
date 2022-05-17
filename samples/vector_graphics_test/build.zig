@@ -14,7 +14,7 @@ pub fn build(b: *std.build.Builder, options: Options) *std.build.LibExeObjStep {
     exe_options.addOption(bool, "enable_tracy", options.enable_tracy);
     exe_options.addOption(bool, "enable_d2d", true);
 
-    const exe = b.addExecutable("vector_graphics_test", thisDir() ++ "/src/vector_graphics_test.zig");
+    const exe = b.addExecutable("vector_graphics_test", comptime thisDir() ++ "/src/vector_graphics_test.zig");
     exe.setBuildMode(options.build_mode);
     exe.setTarget(options.target);
     exe.addOptions("build_options", exe_options);

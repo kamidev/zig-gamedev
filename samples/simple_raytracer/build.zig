@@ -17,14 +17,14 @@ pub fn build(b: *std.build.Builder, options: Options) *std.build.LibExeObjStep {
     exe_options.addOption(bool, "enable_d2d", false);
     exe_options.addOption([]const u8, "content_dir", content_dir);
 
-    const exe = b.addExecutable("simple_raytracer", thisDir() ++ "/src/simple_raytracer.zig");
+    const exe = b.addExecutable("simple_raytracer", comptime thisDir() ++ "/src/simple_raytracer.zig");
     exe.setBuildMode(options.build_mode);
     exe.setTarget(options.target);
     exe.addOptions("build_options", exe_options);
 
     const dxc_step = buildShaders(b);
     const install_content_step = b.addInstallDirectory(.{
-        .source_dir = thisDir() ++ "/" ++ content_dir,
+        .source_dir = comptime thisDir() ++ "/" ++ content_dir,
         .install_dir = .{ .custom = "" },
         .install_subdir = "bin/" ++ content_dir,
     });
@@ -150,10 +150,10 @@ fn makeDxcCmd(
     comptime define: []const u8,
 ) [9][]const u8 {
     const shader_ver = "6_6";
-    const shader_dir = thisDir() ++ "/" ++ content_dir ++ "shaders/";
+    const shader_dir = comptime thisDir() ++ "/" ++ content_dir ++ "shaders/";
     return [9][]const u8{
-        thisDir() ++ "/../../libs/zwin32/bin/x64/dxc.exe",
-        thisDir() ++ "/" ++ input_path,
+        comptime thisDir() ++ "/../../libs/zwin32/bin/x64/dxc.exe",
+        comptime thisDir() ++ "/" ++ input_path,
         if (entry_point.len == 0) "" else "/E " ++ entry_point,
         "/Fo " ++ shader_dir ++ output_filename,
         "/T " ++ profile ++ "_" ++ shader_ver,

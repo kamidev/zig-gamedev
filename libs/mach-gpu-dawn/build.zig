@@ -117,9 +117,9 @@ pub fn link(b: *Builder, step: *std.build.LibExeObjStep, options: Options) void 
 fn linkFromSource(b: *Builder, step: *std.build.LibExeObjStep, options: Options) void {
     ensureSubmodules(b.allocator) catch |err| @panic(@errorName(err));
 
-    step.addIncludeDir(thisDir() ++ "/libs/dawn/out/Debug/gen/include");
-    step.addIncludeDir(thisDir() ++ "/libs/dawn/include");
-    step.addIncludeDir(thisDir() ++ "/src/dawn");
+    step.addIncludeDir(comptime thisDir() ++ "/libs/dawn/out/Debug/gen/include");
+    step.addIncludeDir(comptime thisDir() ++ "/libs/dawn/include");
+    step.addIncludeDir(comptime thisDir() ++ "/src/dawn");
 
     if (options.separate_libs) {
         const lib_mach_dawn_native = buildLibMachDawnNative(b, step, options);
@@ -221,8 +221,8 @@ pub fn linkFromBinary(b: *Builder, step: *std.build.LibExeObjStep, options: Opti
     // Remove OS version range / glibc version from triple (we do not include that in our download
     // URLs.)
     var binary_target = std.zig.CrossTarget.fromTarget(target);
-    binary_target.os_version_min = .{ .none = .{} };
-    binary_target.os_version_max = .{ .none = .{} };
+    binary_target.os_version_min = .{ .none = {} };
+    binary_target.os_version_max = .{ .none = {} };
     binary_target.glibc_version = null;
     const zig_triple = binary_target.zigTriple(b.allocator) catch unreachable;
     ensureBinaryDownloaded(b.allocator, zig_triple, b.is_release, target.os.tag == .windows, options.binary_version);
@@ -959,9 +959,9 @@ fn buildLibTint(b: *Builder, step: *std.build.LibExeObjStep, options: Options) *
     var cpp_sources = std.ArrayList([]const u8).init(b.allocator);
     const target = (std.zig.system.NativeTargetInfo.detect(b.allocator, step.target) catch unreachable).target;
     switch (target.os.tag) {
-        .windows => cpp_sources.append(thisDir() ++ "/libs/dawn/src/tint/diagnostic/printer_windows.cc") catch unreachable,
-        .linux => cpp_sources.append(thisDir() ++ "/libs/dawn/src/tint/diagnostic/printer_linux.cc") catch unreachable,
-        else => cpp_sources.append(thisDir() ++ "/libs/dawn/src/tint/diagnostic/printer_other.cc") catch unreachable,
+        .windows => cpp_sources.append(comptime thisDir() ++ "/libs/dawn/src/tint/diagnostic/printer_windows.cc") catch unreachable,
+        .linux => cpp_sources.append(comptime thisDir() ++ "/libs/dawn/src/tint/diagnostic/printer_linux.cc") catch unreachable,
+        else => cpp_sources.append(comptime thisDir() ++ "/libs/dawn/src/tint/diagnostic/printer_other.cc") catch unreachable,
     }
 
     // libtint_sem_src
@@ -1386,7 +1386,7 @@ fn buildLibDxcompiler(b: *Builder, step: *std.build.LibExeObjStep, options: Opti
 }
 
 fn include(comptime rel: []const u8) []const u8 {
-    return "-I" ++ thisDir() ++ "/" ++ rel;
+    return "-I" ++ comptime thisDir() ++ "/" ++ rel;
 }
 
 fn thisDir() []const u8 {

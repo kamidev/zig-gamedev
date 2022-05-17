@@ -61,12 +61,12 @@ fn buildLibrary(b: *Builder, step: *std.build.LibExeObjStep, options: Options) *
     // TODO(build-system): pass system SDK options through
     system_sdk.include(b, step, .{});
     const target = (std.zig.system.NativeTargetInfo.detect(b.allocator, step.target) catch unreachable).target;
-    const include_glfw_src = "-I" ++ thisDir() ++ "/upstream/glfw/src";
+    const include_glfw_src = "-I" ++ comptime thisDir() ++ "/upstream/glfw/src";
     switch (target.os.tag) {
-        .windows => lib.addCSourceFile(thisDir() ++ "/src/sources_windows.c", &.{ "-D_GLFW_WIN32", include_glfw_src }),
+        .windows => lib.addCSourceFile(comptime thisDir() ++ "/src/sources_windows.c", &.{ "-D_GLFW_WIN32", include_glfw_src }),
         .macos => lib.addCSourceFiles(&.{
-            thisDir() ++ "/src/sources_macos.m",
-            thisDir() ++ "/src/sources_macos.c",
+            comptime thisDir() ++ "/src/sources_macos.m",
+            comptime thisDir() ++ "/src/sources_macos.c",
         }, &.{ "-D_GLFW_COCOA", include_glfw_src }),
         else => {
             // TODO(future): for now, Linux must be built with glibc, not musl:
@@ -83,12 +83,12 @@ fn buildLibrary(b: *Builder, step: *std.build.LibExeObjStep, options: Options) *
                 .X11 => "-D_GLFW_X11",
                 .Wayland => "-D_GLFW_WAYLAND",
             };
-            sources.append(thisDir() ++ "/src/sources_linux.c") catch unreachable;
+            sources.append(comptime thisDir() ++ "/src/sources_linux.c") catch unreachable;
             switch (options.linux_window_manager) {
-                .X11 => sources.append(thisDir() ++ "/src/sources_linux_x11.c") catch unreachable,
-                .Wayland => sources.append(thisDir() ++ "/src/sources_linux_wayland.c") catch unreachable,
+                .X11 => sources.append(comptime thisDir() ++ "/src/sources_linux_x11.c") catch unreachable,
+                .Wayland => sources.append(comptime thisDir() ++ "/src/sources_linux_wayland.c") catch unreachable,
             }
-            lib.addCSourceFiles(sources.items, &.{ flag, "-I" ++ thisDir() ++ "/upstream/glfw/src" });
+            lib.addCSourceFiles(sources.items, &.{ flag, "-I" ++ comptime thisDir() ++ "/upstream/glfw/src" });
         },
     }
     linkGLFWDependencies(b, lib, options);

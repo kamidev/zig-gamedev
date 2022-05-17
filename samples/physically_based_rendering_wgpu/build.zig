@@ -13,12 +13,12 @@ pub fn build(b: *std.build.Builder, options: Options) *std.build.LibExeObjStep {
 
     const exe = b.addExecutable(
         "physically_based_rendering_wgpu",
-        thisDir() ++ "/src/physically_based_rendering_wgpu.zig",
+        comptime thisDir() ++ "/src/physically_based_rendering_wgpu.zig",
     );
     exe.addOptions("build_options", exe_options);
 
     const install_content_step = b.addInstallDirectory(.{
-        .source_dir = thisDir() ++ "/" ++ content_dir,
+        .source_dir = comptime thisDir() ++ "/" ++ content_dir,
         .install_dir = .{ .custom = "" },
         .install_subdir = "bin/" ++ content_dir,
     });

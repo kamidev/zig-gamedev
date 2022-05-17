@@ -27,7 +27,7 @@ pub fn build(b: *std.build.Builder, options: Options, comptime intro_index: u32)
     const intro_index_str = comptime std.fmt.comptimePrint("{}", .{intro_index});
     const exe = b.addExecutable(
         "intro" ++ intro_index_str,
-        thisDir() ++ "/src/intro" ++ intro_index_str ++ ".zig",
+        comptime thisDir() ++ "/src/intro" ++ intro_index_str ++ ".zig",
     );
     exe.setBuildMode(options.build_mode);
     exe.setTarget(options.target);
@@ -35,7 +35,7 @@ pub fn build(b: *std.build.Builder, options: Options, comptime intro_index: u32)
 
     const dxc_step = buildShaders(b, intro_index_str);
     const install_content_step = b.addInstallDirectory(.{
-        .source_dir = thisDir() ++ "/" ++ content_dir,
+        .source_dir = comptime thisDir() ++ "/" ++ content_dir,
         .install_dir = .{ .custom = "" },
         .install_subdir = "bin/" ++ content_dir,
     });
@@ -151,10 +151,10 @@ fn makeDxcCmd(
     comptime define: []const u8,
 ) [9][]const u8 {
     const shader_ver = "6_6";
-    const shader_dir = thisDir() ++ "/" ++ content_dir ++ "shaders/";
+    const shader_dir = comptime thisDir() ++ "/" ++ content_dir ++ "shaders/";
     return [9][]const u8{
-        thisDir() ++ "/../../libs/zwin32/bin/x64/dxc.exe",
-        thisDir() ++ "/" ++ input_path,
+        comptime thisDir() ++ "/../../libs/zwin32/bin/x64/dxc.exe",
+        comptime thisDir() ++ "/" ++ input_path,
         "/E " ++ entry_point,
         "/Fo " ++ shader_dir ++ output_filename,
         "/T " ++ profile ++ "_" ++ shader_ver,
