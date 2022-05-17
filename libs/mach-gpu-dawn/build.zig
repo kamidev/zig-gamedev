@@ -240,7 +240,7 @@ pub fn linkFromBinary(b: *Builder, step: *std.build.LibExeObjStep, options: Opti
     step.linkLibCpp();
 
     step.addIncludeDir(include_dir);
-    step.addIncludeDir(thisDir() ++ "/src/dawn");
+    step.addIncludeDir(comptime thisDir() ++ "/src/dawn");
 
     if (options.linux_window_manager != null and options.linux_window_manager.? == .X11) {
         step.linkSystemLibraryName("X11");
