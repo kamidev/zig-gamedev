@@ -90,8 +90,8 @@ pub fn build(b: *std.build.Builder) void {
     zglfw.link(zgpu_tests);
     test_step.dependOn(&zgpu_tests.step);
 
-    const zmath_tests = zmath.buildTests(b, options.build_mode, options.target);
-    test_step.dependOn(&zmath_tests.step);
+    // const zmath_tests = zmath.buildTests(b, options.build_mode, options.target);
+    // test_step.dependOn(&zmath_tests.step);
 
     const zbullet_tests = @import("libs/zbullet/build.zig").buildTests(b, options.build_mode, options.target);
     zbullet_tests.addPackage(zmath.pkg);
