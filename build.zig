@@ -55,8 +55,11 @@ pub fn build(b: *std.build.Builder) void {
     installDemo(b, gamepad_wgpu.build(b, options), "gamepad_wgpu");
     installDemo(b, physics_test_wgpu.build(b, options), "physics_test_wgpu");
 
-    if (@import("builtin").target.os.tag == .windows) {
+    if (options.target.isWindows()) {
         installDemo(b, minimal.build(b, options), "minimal");
+    }
+
+    if (@import("builtin").target.os.tag == .windows) {
         installDemo(b, triangle.build(b, options), "triangle");
         installDemo(b, textured_quad.build(b, options), "textured_quad");
         installDemo(b, mesh_shader_test.build(b, options), "mesh_shader_test");
@@ -66,6 +69,7 @@ pub fn build(b: *std.build.Builder) void {
         installDemo(b, simple_raytracer.build(b, options), "simple_raytracer");
         installDemo(b, audio_playback_test.build(b, options), "audio_playback_test");
         installDemo(b, audio_experiments.build(b, options), "audio_experiments");
+        installDemo(b, directml_convolution_test.build(b, options), "directml_convolution_test");
 
         comptime var intro_index: u32 = 0;
         inline while (intro_index < 7) : (intro_index += 1) {
@@ -164,6 +168,7 @@ const simple_raytracer = @import("samples/simple_raytracer/build.zig");
 const intro = @import("samples/intro/build.zig");
 const audio_playback_test = @import("samples/audio_playback_test/build.zig");
 const audio_experiments = @import("samples/audio_experiments/build.zig");
+const directml_convolution_test = @import("samples/directml_convolution_test/build.zig");
 
 pub const Options = struct {
     build_mode: std.builtin.Mode,

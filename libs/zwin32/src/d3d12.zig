@@ -1,30 +1,30 @@
 const std = @import("std");
-const windows = @import("windows.zig");
+const w32 = @import("w32.zig");
 const dxgi = @import("dxgi.zig");
 const d3d = @import("d3dcommon.zig");
-const UINT = windows.UINT;
-const IUnknown = windows.IUnknown;
-const HRESULT = windows.HRESULT;
-const GUID = windows.GUID;
-const LUID = windows.LUID;
-const WINAPI = windows.WINAPI;
-const FLOAT = windows.FLOAT;
-const LPCWSTR = windows.LPCWSTR;
-const LPCSTR = windows.LPCSTR;
-const UINT8 = windows.UINT8;
-const UINT16 = windows.UINT16;
-const UINT32 = windows.UINT32;
-const UINT64 = windows.UINT64;
-const INT = windows.INT;
-const INT8 = windows.INT8;
-const BYTE = windows.BYTE;
-const DWORD = windows.DWORD;
-const SIZE_T = windows.SIZE_T;
-const HANDLE = windows.HANDLE;
-const SECURITY_ATTRIBUTES = windows.SECURITY_ATTRIBUTES;
-const BOOL = windows.BOOL;
-const FALSE = windows.FALSE;
-const TRUE = windows.TRUE;
+const UINT = w32.UINT;
+const IUnknown = w32.IUnknown;
+const HRESULT = w32.HRESULT;
+const GUID = w32.GUID;
+const LUID = w32.LUID;
+const WINAPI = w32.WINAPI;
+const FLOAT = w32.FLOAT;
+const LPCWSTR = w32.LPCWSTR;
+const LPCSTR = w32.LPCSTR;
+const UINT8 = w32.UINT8;
+const UINT16 = w32.UINT16;
+const UINT32 = w32.UINT32;
+const UINT64 = w32.UINT64;
+const INT = w32.INT;
+const INT8 = w32.INT8;
+const BYTE = w32.BYTE;
+const DWORD = w32.DWORD;
+const SIZE_T = w32.SIZE_T;
+const HANDLE = w32.HANDLE;
+const SECURITY_ATTRIBUTES = w32.SECURITY_ATTRIBUTES;
+const BOOL = w32.BOOL;
+const FALSE = w32.FALSE;
+const TRUE = w32.TRUE;
 
 pub const RESOURCE_BARRIER_ALL_SUBRESOURCES = 0xffff_ffff;
 
@@ -558,7 +558,7 @@ pub const VIEWPORT = extern struct {
     MaxDepth: FLOAT,
 };
 
-pub const RECT = windows.RECT;
+pub const RECT = w32.RECT;
 
 pub const RESOURCE_STATES = packed struct(UINT) {
     VERTEX_AND_CONSTANT_BUFFER: bool = false, // 0x1
@@ -1191,15 +1191,15 @@ pub const FEATURE = enum(UINT) {
 };
 
 pub const SHADER_MODEL = enum(UINT) {
-    SM_5_1 = 0x51,
-    SM_6_0 = 0x60,
-    SM_6_1 = 0x61,
-    SM_6_2 = 0x62,
-    SM_6_3 = 0x63,
-    SM_6_4 = 0x64,
-    SM_6_5 = 0x65,
-    SM_6_6 = 0x66,
-    SM_6_7 = 0x67,
+    @"5_1" = 0x51,
+    @"6_0" = 0x60,
+    @"6_1" = 0x61,
+    @"6_2" = 0x62,
+    @"6_3" = 0x63,
+    @"6_4" = 0x64,
+    @"6_5" = 0x65,
+    @"6_6" = 0x66,
+    @"6_7" = 0x67,
 };
 
 pub const RESOURCE_BINDING_TIER = enum(UINT) {
@@ -6200,20 +6200,24 @@ pub const IProtectedResourceSession = extern struct {
     };
 };
 
-pub extern "d3d12" fn D3D12GetDebugInterface(*const GUID, ?*?*anyopaque) callconv(WINAPI) HRESULT;
+extern "d3d12" fn D3D12GetDebugInterface(*const GUID, ?*?*anyopaque) callconv(WINAPI) HRESULT;
 
-pub extern "d3d12" fn D3D12CreateDevice(
+extern "d3d12" fn D3D12CreateDevice(
     ?*IUnknown,
     d3d.FEATURE_LEVEL,
     *const GUID,
     ?*?*anyopaque,
 ) callconv(WINAPI) HRESULT;
 
-pub extern "d3d12" fn D3D12SerializeVersionedRootSignature(
+extern "d3d12" fn D3D12SerializeVersionedRootSignature(
     *const VERSIONED_ROOT_SIGNATURE_DESC,
     ?*?*d3d.IBlob,
     ?*?*d3d.IBlob,
 ) callconv(WINAPI) HRESULT;
+
+pub const CreateDevice = D3D12CreateDevice;
+pub const GetDebugInterface = D3D12GetDebugInterface;
+pub const SerializeVersionedRootSignature = D3D12SerializeVersionedRootSignature;
 
 pub const IID_ICommandQueue = GUID{
     .Data1 = 0x0ec870a6,

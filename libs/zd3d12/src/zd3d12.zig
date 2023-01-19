@@ -1,7 +1,7 @@
 const std = @import("std");
 const assert = std.debug.assert;
 const zwin32 = @import("zwin32");
-const w32 = zwin32.base;
+const w32 = zwin32.w32;
 const dwrite = zwin32.dwrite;
 const dxgi = zwin32.dxgi;
 const d3d11 = zwin32.d3d11;
@@ -119,7 +119,7 @@ pub const GraphicsContext = struct {
 
         if (enable_debug_layer) {
             var maybe_debug: ?*d3d12d.IDebug1 = null;
-            _ = d3d12.D3D12GetDebugInterface(&d3d12d.IID_IDebug1, @ptrCast(*?*anyopaque, &maybe_debug));
+            _ = d3d12.GetDebugInterface(&d3d12d.IID_IDebug1, @ptrCast(*?*anyopaque, &maybe_debug));
             if (maybe_debug) |debug| {
                 debug.EnableDebugLayer();
                 if (enable_gbv) {
@@ -149,9 +149,9 @@ pub const GraphicsContext = struct {
                             continue;
                         }
 
-                        const hr = d3d12.D3D12CreateDevice(
+                        const hr = d3d12.CreateDevice(
                             @ptrCast(*w32.IUnknown, adapter1),
-                            .FL_11_1,
+                            .@"11_1",
                             &d3d12.IID_IDevice9,
                             null,
                         );
@@ -170,39 +170,39 @@ pub const GraphicsContext = struct {
 
         const device = blk: {
             var device: *d3d12.IDevice9 = undefined;
-            const hr = d3d12.D3D12CreateDevice(
+            const hr = d3d12.CreateDevice(
                 if (suitable_adapter) |adapter| @ptrCast(*w32.IUnknown, adapter) else null,
-                .FL_11_1,
+                .@"11_1",
                 &d3d12.IID_IDevice9,
                 @ptrCast(*?*anyopaque, &device),
             );
 
             if (hr != w32.S_OK) {
-                _ = w32.user32.messageBoxA(
+                _ = w32.MessageBoxA(
                     window,
                     "Failed to create Direct3D 12 Device. This applications requires graphics card " ++
                         "with DirectX 12 Feature Level 11.1 support.",
                     "Your graphics card driver may be old",
-                    w32.user32.MB_OK | w32.user32.MB_ICONERROR,
-                ) catch 0;
-                w32.kernel32.ExitProcess(0);
+                    w32.MB_OK | w32.MB_ICONERROR,
+                );
+                w32.ExitProcess(0);
             }
             break :blk device;
         };
 
         // Check for Shader Model 6.6 support.
         {
-            var data: d3d12.FEATURE_DATA_SHADER_MODEL = .{ .HighestShaderModel = .SM_6_7 };
+            var data: d3d12.FEATURE_DATA_SHADER_MODEL = .{ .HighestShaderModel = .@"6_7" };
             const hr = device.CheckFeatureSupport(.SHADER_MODEL, &data, @sizeOf(d3d12.FEATURE_DATA_SHADER_MODEL));
-            if (hr != w32.S_OK or @enumToInt(data.HighestShaderModel) < @enumToInt(d3d12.SHADER_MODEL.SM_6_6)) {
-                _ = w32.user32.messageBoxA(
+            if (hr != w32.S_OK or @enumToInt(data.HighestShaderModel) < @enumToInt(d3d12.SHADER_MODEL.@"6_6")) {
+                _ = w32.MessageBoxA(
                     window,
                     "This applications requires graphics card driver that supports Shader Model 6.6. " ++
                         "Please update your graphics driver and try again.",
                     "Your graphics card driver may be old",
-                    w32.user32.MB_OK | w32.user32.MB_ICONERROR,
-                ) catch 0;
-                w32.kernel32.ExitProcess(0);
+                    w32.MB_OK | w32.MB_ICONERROR,
+                );
+                w32.ExitProcess(0);
             }
         }
 
@@ -213,14 +213,14 @@ pub const GraphicsContext = struct {
             if (hr != w32.S_OK or
                 @enumToInt(data.ResourceBindingTier) < @enumToInt(d3d12.RESOURCE_BINDING_TIER.TIER_3))
             {
-                _ = w32.user32.messageBoxA(
+                _ = w32.MessageBoxA(
                     window,
                     "This applications requires graphics card driver that supports Resource Binding Tier 3. " ++
                         "Please update your graphics driver and try again.",
                     "Your graphics card driver may be old",
-                    w32.user32.MB_OK | w32.user32.MB_ICONERROR,
-                ) catch 0;
-                w32.kernel32.ExitProcess(0);
+                    w32.MB_OK | w32.MB_ICONERROR,
+                );
+                w32.ExitProcess(0);
             }
         }
 
@@ -501,12 +501,12 @@ pub const GraphicsContext = struct {
             break :blk frame_fence;
         };
 
-        const frame_fence_event = w32.CreateEventEx(
+        const frame_fence_event = w32.CreateEventExA(
             null,
             "frame_fence_event",
             0,
             w32.EVENT_ALL_ACCESS,
-        ) catch unreachable;
+        ).?;
 
         const cmdallocs = blk: {
             var cmdallocs: [max_num_buffered_frames]*d3d12.ICommandAllocator = undefined;
@@ -573,7 +573,7 @@ pub const GraphicsContext = struct {
     pub fn deinit(gctx: *GraphicsContext, allocator: std.mem.Allocator) void {
         gctx.finishGpuCommands();
         gctx.transition_resource_barriers.deinit(allocator);
-        w32.CloseHandle(gctx.frame_fence_event);
+        _ = w32.CloseHandle(gctx.frame_fence_event);
         gctx.resource_pool.deinit(allocator);
         gctx.pipeline_pool.deinit(allocator);
         gctx.rtv_heap.deinit();
@@ -650,7 +650,7 @@ pub const GraphicsContext = struct {
         const gpu_frame_counter = gctx.frame_fence.GetCompletedValue();
         if ((gctx.frame_fence_counter - gpu_frame_counter) >= max_num_buffered_frames) {
             hrPanicOnFail(gctx.frame_fence.SetEventOnCompletion(gpu_frame_counter + 1, gctx.frame_fence_event));
-            w32.WaitForSingleObject(gctx.frame_fence_event, w32.INFINITE) catch unreachable;
+            _ = w32.WaitForSingleObject(gctx.frame_fence_event, w32.INFINITE);
         }
 
         gctx.frame_index = (gctx.frame_index + 1) % max_num_buffered_frames;
@@ -757,7 +757,7 @@ pub const GraphicsContext = struct {
 
         hrPanicOnFail(gctx.cmdqueue.Signal(gctx.frame_fence, gctx.frame_fence_counter));
         hrPanicOnFail(gctx.frame_fence.SetEventOnCompletion(gctx.frame_fence_counter, gctx.frame_fence_event));
-        w32.WaitForSingleObject(gctx.frame_fence_event, w32.INFINITE) catch unreachable;
+        _ = w32.WaitForSingleObject(gctx.frame_fence_event, w32.INFINITE);
 
         // Reset current non-persistent heap (+1 because heap 0 is persistent)
         gctx.cbv_srv_uav_gpu_heaps[gctx.frame_index + 1].size = 0;
