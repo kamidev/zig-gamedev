@@ -1,4 +1,17 @@
-# zwin32 - standalone Zig bindings for Win32 API
+# zwin32 - Zig bindings for Win32 API
+
+Can be used on Windows and Linux. Contains partial bindings for:
+* Win32 API
+* Direct3D 12
+* Direct3D 11
+* DXGI
+* DirectML
+* Direct2D
+* XAudio2
+* Wincodec (WIC)
+* WASAPI
+* Media Foundation
+* DirectWrite
 
 ## Getting started
 
