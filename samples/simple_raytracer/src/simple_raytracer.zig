@@ -134,17 +134,31 @@ const DemoState = struct {
     dxr_draw_mode: i32, // 0 - no shadows, 1 - shadows, 2 - shadow mask
 };
 
-fn parseAndLoadGltfFile(gltf_path: []const u8) *c.cgltf_data {
+fn parseAndLoadGltfFile(path: []const u8) *c.cgltf_data {
     var data: *c.cgltf_data = undefined;
     const options = std.mem.zeroes(c.cgltf_options);
+
+    var buffer: [std.fs.MAX_PATH_BYTES]u8 = undefined;
+    var fba = std.heap.FixedBufferAllocator.init(buffer[0..]);
+    const allocator = fba.allocator();
+
+    const full_path = std.fs.path.joinZ(allocator, &.{
+        std.fs.selfExeDirPathAlloc(allocator) catch unreachable,
+        path,
+    }) catch unreachable;
+
     // Parse.
     {
-        const result = c.cgltf_parse_file(&options, gltf_path.ptr, @ptrCast([*c][*c]c.cgltf_data, &data));
+        const result = c.cgltf_parse_file(
+            &options,
+            full_path.ptr,
+            @ptrCast([*c][*c]c.cgltf_data, &data),
+        );
         assert(result == c.cgltf_result_success);
     }
     // Load.
     {
-        const result = c.cgltf_load_buffers(&options, data, gltf_path.ptr);
+        const result = c.cgltf_load_buffers(&options, data, full_path.ptr);
         assert(result == c.cgltf_result_success);
     }
     return data;
@@ -405,14 +419,13 @@ fn loadScene(
     while (image_index < num_images) : (image_index += 1) {
         const image = &data.images[image_index];
 
-        var buffer: [64]u8 = undefined;
-        const path = std.fmt.bufPrint(
-            buffer[0..],
+        const relpath = std.fmt.allocPrint(
+            arena,
             content_dir ++ "Sponza/{s}",
             .{image.uri},
         ) catch unreachable;
 
-        const texture = gctx.createAndUploadTex2dFromFile(path, .{}) catch unreachable;
+        const texture = gctx.createAndUploadTex2dFromFile(relpath, .{}) catch unreachable;
         const view = gctx.allocateCpuDescriptors(.CBV_SRV_UAV, 1);
         gctx.device.CreateShaderResourceView(gctx.lookupResource(texture).?, null, view);
 
@@ -517,10 +530,12 @@ fn init(allocator: std.mem.Allocator) !DemoState {
     var trace_shadow_rays_stateobj: ?*d3d12.IStateObject = null;
     var trace_shadow_rays_rs: ?*d3d12.IRootSignature = null;
     if (dxr_is_supported) {
-        const cso_file = std.fs.cwd().openFile(
+        const full_path = std.fs.path.join(arena_allocator, &.{
+            std.fs.selfExeDirPathAlloc(arena_allocator) catch unreachable,
             content_dir ++ "shaders/trace_shadow_rays.lib.cso",
-            .{},
-        ) catch unreachable;
+        }) catch unreachable;
+
+        const cso_file = std.fs.openFileAbsolute(full_path, .{}) catch unreachable;
         defer cso_file.close();
 
         const cso_code = cso_file.reader().readAllAlloc(arena_allocator, 256 * 1024) catch unreachable;
