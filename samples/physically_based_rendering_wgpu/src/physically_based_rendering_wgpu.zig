@@ -4,7 +4,7 @@ const assert = std.debug.assert;
 const zglfw = @import("zglfw");
 const zgpu = @import("zgpu");
 const wgpu = zgpu.wgpu;
-const zgui = @import("zgui");
+//const zgui = @import("zgui");
 const zm = @import("zmath");
 const zmesh = @import("zmesh");
 const wgsl = @import("physically_based_rendering_wgsl.zig");
@@ -514,43 +514,43 @@ fn destroy(allocator: std.mem.Allocator, demo: *DemoState) void {
 }
 
 fn update(demo: *DemoState) void {
-    zgui.backend.newFrame(
-        demo.gctx.swapchain_descriptor.width,
-        demo.gctx.swapchain_descriptor.height,
-    );
+    // zgui.backend.newFrame(
+    //     demo.gctx.swapchain_descriptor.width,
+    //     demo.gctx.swapchain_descriptor.height,
+    // );
 
-    zgui.setNextWindowPos(.{ .x = 20.0, .y = 20.0, .cond = .always });
-    zgui.setNextWindowSize(.{ .w = -1.0, .h = -1.0, .cond = .always });
+    // zgui.setNextWindowPos(.{ .x = 20.0, .y = 20.0, .cond = .always });
+    // zgui.setNextWindowSize(.{ .w = -1.0, .h = -1.0, .cond = .always });
 
-    if (zgui.begin("Demo Settings", .{ .flags = .{ .no_move = true, .no_resize = true } })) {
-        zgui.bulletText(
-            "Average : {d:.3} ms/frame ({d:.1} fps)",
-            .{ demo.gctx.stats.average_cpu_time, demo.gctx.stats.fps },
-        );
-        zgui.bulletText("LMB + drag : rotate helmet", .{});
-        zgui.bulletText("RMB + drag : rotate camera", .{});
-        zgui.bulletText("W, A, S, D : move camera", .{});
+    // if (zgui.begin("Demo Settings", .{ .flags = .{ .no_move = true, .no_resize = true } })) {
+    //     zgui.bulletText(
+    //         "Average : {d:.3} ms/frame ({d:.1} fps)",
+    //         .{ demo.gctx.stats.average_cpu_time, demo.gctx.stats.fps },
+    //     );
+    //     zgui.bulletText("LMB + drag : rotate helmet", .{});
+    //     zgui.bulletText("RMB + drag : rotate camera", .{});
+    //     zgui.bulletText("W, A, S, D : move camera", .{});
 
-        zgui.spacing();
-        zgui.spacing();
-        zgui.sameLine(.{ .spacing = 0.0 });
-        if (zgui.combo("HDRI", .{
-            .current_item = &demo.current_hdri_index,
-            .items_separated_by_zeros = "Newport Loft\x00Drackenstein Quarry\x00Freight Station\x00\x00",
-        })) {
-            demo.is_lighting_precomputed = false;
-        }
+    //     zgui.spacing();
+    //     zgui.spacing();
+    //     zgui.sameLine(.{ .spacing = 0.0 });
+    //     if (zgui.combo("HDRI", .{
+    //         .current_item = &demo.current_hdri_index,
+    //         .items_separated_by_zeros = "Newport Loft\x00Drackenstein Quarry\x00Freight Station\x00\x00",
+    //     })) {
+    //         demo.is_lighting_precomputed = false;
+    //     }
 
-        zgui.spacing();
-        zgui.spacing();
-        _ = zgui.radioButtonStatePtr("Draw PBR effect", .{ .v = &demo.draw_mode, .v_button = 0 });
-        _ = zgui.radioButtonStatePtr("Draw Ambient Occlusion texture", .{ .v = &demo.draw_mode, .v_button = 1 });
-        _ = zgui.radioButtonStatePtr("Draw Base Color texture", .{ .v = &demo.draw_mode, .v_button = 2 });
-        _ = zgui.radioButtonStatePtr("Draw Metallic texture", .{ .v = &demo.draw_mode, .v_button = 3 });
-        _ = zgui.radioButtonStatePtr("Draw Roughness texture", .{ .v = &demo.draw_mode, .v_button = 4 });
-        _ = zgui.radioButtonStatePtr("Draw Normal texture", .{ .v = &demo.draw_mode, .v_button = 5 });
-    }
-    zgui.end();
+    //     zgui.spacing();
+    //     zgui.spacing();
+    //     _ = zgui.radioButtonStatePtr("Draw PBR effect", .{ .v = &demo.draw_mode, .v_button = 0 });
+    //     _ = zgui.radioButtonStatePtr("Draw Ambient Occlusion texture", .{ .v = &demo.draw_mode, .v_button = 1 });
+    //     _ = zgui.radioButtonStatePtr("Draw Base Color texture", .{ .v = &demo.draw_mode, .v_button = 2 });
+    //     _ = zgui.radioButtonStatePtr("Draw Metallic texture", .{ .v = &demo.draw_mode, .v_button = 3 });
+    //     _ = zgui.radioButtonStatePtr("Draw Roughness texture", .{ .v = &demo.draw_mode, .v_button = 4 });
+    //     _ = zgui.radioButtonStatePtr("Draw Normal texture", .{ .v = &demo.draw_mode, .v_button = 5 });
+    // }
+    // zgui.end();
 
     const window = demo.gctx.window;
 
@@ -756,7 +756,7 @@ fn draw(demo: *DemoState) void {
                 pass.end();
                 pass.release();
             }
-            zgui.backend.draw(pass);
+            //zgui.backend.draw(pass);
         }
 
         break :commands encoder.finish(null);
@@ -1117,25 +1117,25 @@ pub fn main() !void {
     const demo = try create(allocator, window);
     defer destroy(allocator, demo);
 
-    const scale_factor = scale_factor: {
-        const scale = window.getContentScale();
-        break :scale_factor @max(scale[0], scale[1]);
-    };
+    // const scale_factor = scale_factor: {
+    //     const scale = window.getContentScale();
+    //     break :scale_factor @max(scale[0], scale[1]);
+    // };
 
-    zgui.init(allocator);
-    defer zgui.deinit();
+    // zgui.init(allocator);
+    // defer zgui.deinit();
 
-    _ = zgui.io.addFontFromFile(content_dir ++ "Roboto-Medium.ttf", math.floor(16.0 * scale_factor));
+    // _ = zgui.io.addFontFromFile(content_dir ++ "Roboto-Medium.ttf", math.floor(16.0 * scale_factor));
 
-    zgui.backend.init(
-        window,
-        demo.gctx.device,
-        @intFromEnum(zgpu.GraphicsContext.swapchain_format),
-        @intFromEnum(wgpu.TextureFormat.undef),
-    );
-    defer zgui.backend.deinit();
+    // zgui.backend.init(
+    //     window,
+    //     demo.gctx.device,
+    //     @intFromEnum(zgpu.GraphicsContext.swapchain_format),
+    //     @intFromEnum(wgpu.TextureFormat.undef),
+    // );
+    // defer zgui.backend.deinit();
 
-    zgui.getStyle().scaleAllSizes(scale_factor);
+    // zgui.getStyle().scaleAllSizes(scale_factor);
 
     while (!window.shouldClose() and window.getKey(.escape) != .press) {
         zglfw.pollEvents();

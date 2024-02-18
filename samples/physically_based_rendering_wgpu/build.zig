@@ -11,14 +11,14 @@ pub fn build(b: *std.Build, options: Options) *std.Build.Step.Compile {
         .optimize = options.optimize,
     });
 
-    const zgui_pkg = @import("../../build.zig").zgui_glfw_wgpu_pkg;
+    //const zgui_pkg = @import("../../build.zig").zgui_glfw_wgpu_pkg;
     const zmath_pkg = @import("../../build.zig").zmath_pkg;
     const zgpu_pkg = @import("../../build.zig").zgpu_pkg;
     const zglfw_pkg = @import("../../build.zig").zglfw_pkg;
     const zstbi_pkg = @import("../../build.zig").zstbi_pkg;
     const zmesh_pkg = @import("../../build.zig").zmesh_pkg;
 
-    zgui_pkg.link(exe);
+    //zgui_pkg.link(exe);
     zgpu_pkg.link(exe);
     zglfw_pkg.link(exe);
     zstbi_pkg.link(exe);
